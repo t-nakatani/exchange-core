@@ -1,0 +1,17 @@
+[project]
+name = "exchange-core"
+version = "0.1.0"
+description = "取引所抽象化レイヤー（ccxtベース）"
+readme = "README.md"
+authors = [
+    { name = "t-nakatani", email = "tomoya.12@icloud.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "ccxt>=4.5.34",
+    "pydantic>=2.12.5",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
