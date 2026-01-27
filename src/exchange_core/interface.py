@@ -47,6 +47,21 @@ class OHLCV(BaseModel):
     volume: float
 
 
+class Orderbook(BaseModel):
+    """オーダーブックデータ."""
+
+    asks: list[list[float]]  # [[price, amount], ...]
+    bids: list[list[float]]  # [[price, amount], ...]
+
+    @property
+    def best_ask(self) -> float:
+        return self.asks[0][0]
+
+    @property
+    def best_bid(self) -> float:
+        return self.bids[0][0]
+
+
 class IExchange(ABC):
     """取引所クライアントの抽象インターフェース."""
 
@@ -54,6 +69,11 @@ class IExchange(ABC):
     @abstractmethod
     async def create(cls, config: dict) -> Self:
         """ファクトリメソッド: 非同期初期化が必要なクライアントを作成."""
+        pass
+
+    @abstractmethod
+    async def get_orderbook(self, symbol: str) -> Orderbook:
+        """指定シンボルのオーダーブックを取得."""
         pass
 
     @abstractmethod

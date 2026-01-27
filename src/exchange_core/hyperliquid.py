@@ -4,7 +4,7 @@ from typing import Literal, Self
 
 import ccxt.async_support as ccxt_async
 
-from exchange_core.interface import IExchange, OHLCV, Order, Position, Ticker
+from exchange_core.interface import IExchange, OHLCV, Order, Orderbook, Position, Ticker
 
 
 class HyperliquidExchange(IExchange):
@@ -26,6 +26,19 @@ class HyperliquidExchange(IExchange):
         exchange = ccxt_async.hyperliquid(config)
         await exchange.load_markets()
         return cls(exchange)
+
+    async def get_orderbook(self, symbol: str) -> Orderbook:
+        """
+        指定シンボルのオーダーブックを取得.
+
+        Args:
+            symbol: ccxt形式のシンボル（例: "BTC/USDC:USDC"）
+        """
+        response = await self._exchange.fetch_order_book(symbol)
+        return Orderbook(
+            asks=[[float(ask[0]), float(ask[1])] for ask in response["asks"]],
+            bids=[[float(bid[0]), float(bid[1])] for bid in response["bids"]],
+        )
 
     async def get_ticker(self, symbol: str) -> Ticker:
         """
