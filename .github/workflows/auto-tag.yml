@@ -1,0 +1,51 @@
+name: Auto Tag on Main Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 全タグを取得するために必要
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # 最新のタグを取得（なければ v0.0.0）
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "Latest tag: $LATEST_TAG"
+
+      - name: Bump minor version
+        id: bump
+        run: |
+          LATEST_TAG="${{ steps.get_tag.outputs.latest_tag }}"
+          # v を除去してバージョン部分を取得
+          VERSION=${LATEST_TAG#v}
+          
+          # major.minor.patch に分割
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          
+          # minor をインクリメント、patch を 0 にリセット
+          NEW_MINOR=$((MINOR + 1))
+          NEW_TAG="v${MAJOR}.${NEW_MINOR}.0"
+          
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "New tag: $NEW_TAG"
+
+      - name: Create and push tag
+        run: |
+          NEW_TAG="${{ steps.bump.outputs.new_tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
+          git push origin "$NEW_TAG"
