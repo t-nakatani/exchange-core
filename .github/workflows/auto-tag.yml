@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'src/**'
 
 jobs:
   tag:
@@ -25,7 +27,7 @@ jobs:
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           echo "Latest tag: $LATEST_TAG"
 
-      - name: Bump minor version
+      - name: Bump patch version
         id: bump
         run: |
           LATEST_TAG="${{ steps.get_tag.outputs.latest_tag }}"
@@ -35,9 +37,9 @@ jobs:
           # major.minor.patch に分割
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           
-          # minor をインクリメント、patch を 0 にリセット
-          NEW_MINOR=$((MINOR + 1))
-          NEW_TAG="v${MAJOR}.${NEW_MINOR}.0"
+          # patch をインクリメント
+          NEW_PATCH=$((PATCH + 1))
+          NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
           
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "New tag: $NEW_TAG"
