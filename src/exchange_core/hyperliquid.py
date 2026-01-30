@@ -208,6 +208,16 @@ class HyperliquidExchange(IExchange):
             for order in response
         ]
 
+    async def set_leverage(self, symbol: str, leverage: int) -> None:
+        """
+        レバレッジを設定.
+
+        Args:
+            symbol: ccxt形式のシンボル
+            leverage: レバレッジ倍率
+        """
+        await self._exchange.set_leverage(leverage, symbol)
+
     async def close(self) -> None:
         """クライアントのリソースをクリーンアップ."""
         await self._exchange.close()

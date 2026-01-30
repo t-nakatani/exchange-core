@@ -112,6 +112,11 @@ class IExchange(ABC):
         pass
 
     @abstractmethod
+    async def set_leverage(self, symbol: str, leverage: int) -> None:
+        """レバレッジを設定."""
+        pass
+
+    @abstractmethod
     async def close(self) -> None:
         """クライアントのリソースをクリーンアップ."""
         pass
